@@ -92,4 +92,9 @@ public final class BottleList implements Iterable<Bottle> {
     public Iterator<Bottle> iterator() {
         return bottleList.iterator();
     }
+    
+    @Override
+    public String toString() {
+        return bottleList.toString();
+    }
 }

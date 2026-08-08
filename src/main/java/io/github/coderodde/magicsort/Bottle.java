@@ -17,17 +17,28 @@ public final class Bottle {
      * This enumeration specifies all the valid section colours.
      */
     public enum SectionColor {
-        NONE,
-        RED,
-        ORANGE,
-        YELLOW,
-        GREEN,
-        BLUE,
-        LIGHT_BLUE,
-        PURPLE,
-        BROWN,
-        NAVY,
-        PINK;
+        NONE           ("x"),
+        RED            ("R"),
+        ORANGE         ("O"),
+        YELLOW         ("Y"),
+        GREEN          ("G"),
+        BLUE           ("B"),
+        LIGHT_BLUE     ("L"),
+        VIOLET         ("V"),
+        BROWN          ("B"),
+        NAVY           ("N"),
+        PINK           ("P");
+        
+        private final String name;
+        
+        private SectionColor(String name) {
+            this.name = name;
+        }
+        
+        @Override
+        public String toString() {
+            return name;
+        }
     }
     
     // The sections[0] is the topmost section, the sections[3] is at the bottom:
@@ -146,5 +157,16 @@ public final class Bottle {
             
             target.push(clr);
         }
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder().append("{");
+        
+        for (SectionColor sectionColor : sections) {
+            sb.append(sectionColor);
+        }
+        
+        return sb.append("]").toString();
     }
 }

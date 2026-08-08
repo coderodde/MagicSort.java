@@ -72,6 +72,12 @@ public final class BottleFieldRandomizer {
         return bottleList;
     }
     
+    /**
+     * Fills the input bottle entirely with the input section color.
+     * 
+     * @param bottle the target bottle.
+     * @param color  the target color.
+     */
     private void precolorBottle(Bottle bottle, SectionColor color) {
         for (int i = 0; i < bottle.totalSections(); ++i) {
             bottle.push(color);
@@ -79,20 +85,31 @@ public final class BottleFieldRandomizer {
     }
     
     private void pourRandomize(BottleList bottleList, int pours) {
-        int tentativePours = 0;
-        
-        while (tentativePours < pours) {
+        for (int i = 0; i < pours; ++i) {
+            System.out.println("i == " + i);
             Bottle sourceBottle = findNonEmptyBottle(bottleList);
+            
+            if (sourceBottle == null) {
+                continue;
+            }
+            
             Bottle targetBottle = findNonFullBottle(bottleList);
+            
+            if (targetBottle == null) {
+                continue;
+            }
             
             int maximumPourSections = Math.min(sourceBottle.filledSections(),
                                                targetBottle.freeSections());
             
-            int actualPours = random.nextInt(maximumPourSections) + 1;
+            int actualPours = getActualPours(maximumPourSections);
             
             sourceBottle.pourTo(targetBottle, actualPours);
-            ++tentativePours;
         }
+    }
+    
+    private int getActualPours(int maximumPourSection) {
+        return 1 + random.nextInt(maximumPourSection);
     }
     
     private Bottle findNonFullBottle(BottleList bottleList) {
@@ -104,7 +121,9 @@ public final class BottleFieldRandomizer {
             }
         }
         
-        return choose(candidatesBottleList, random);
+        return candidatesBottleList.isEmpty() ? 
+                null : 
+                choose(candidatesBottleList, random);
     }
     
     private Bottle findNonEmptyBottle(BottleList bottleList) {
@@ -116,7 +135,9 @@ public final class BottleFieldRandomizer {
             }
         }
         
-        return choose(candidatesBottleList, random);
+        return choose(candidatesBottleList, random).isEmpty() ?
+                null :
+                choose(candidatesBottleList, random);
     }
     
     private static <T> T choose(List<T> list, Random random) {
