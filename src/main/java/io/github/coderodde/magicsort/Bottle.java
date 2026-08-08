@@ -109,20 +109,18 @@ public final class Bottle {
     }
     
     public SectionColor getTopmostSectionColor() {
-        for (int i = 0; i < filledSections; ++i) {
-            if (sections[i] != NONE) {
-                return sections[i];
-            }
+        if (isEmpty()) {
+            return NONE;
         }
         
-        return NONE;
+        return sections[SECTIONS - filledSections()];
     }
     
     public SectionColor pop() {
         int targetSectionIndex          = freeSections();
         SectionColor color              = sections[targetSectionIndex];
         sections[targetSectionIndex]    = SectionColor.NONE;
-        
+        filledSections--;
         return color;
     }
     
