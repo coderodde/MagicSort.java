@@ -1,6 +1,7 @@
 package io.github.coderodde.magicsort;
 
 import io.github.coderodde.magicsort.Bottle.SectionColor;
+import static io.github.coderodde.magicsort.Bottle.SectionColor.NONE;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -8,7 +9,7 @@ import java.util.Random;
 /**
  * This class is responsible for randomizing the bottle sets.
  */
-public final class BottleFieldRandomizer {
+public final class RandomBottleListBuilder {
     
     /**
      * The default seed for the {@link java.util.Random}.
@@ -21,11 +22,16 @@ public final class BottleFieldRandomizer {
     private final Random random;
     
     /**
+     * This list caches all the non-full bottles.
+     */
+    private final List<Bottle> nonFullBottleList = new ArrayList<>();
+    
+    /**
      * This constructor builds this bottle list randomizer.
      * 
      * @param random the random number generator to use. 
      */
-    public BottleFieldRandomizer(Random random) {
+    public RandomBottleListBuilder(Random random) {
         this.random = random;
     }
     
@@ -34,7 +40,7 @@ public final class BottleFieldRandomizer {
      * 
      * @param seed the seed value for the random number generator.
      */
-    public BottleFieldRandomizer(long seed) {
+    public RandomBottleListBuilder(long seed) {
         this(new Random(seed));
     }
     
@@ -42,7 +48,7 @@ public final class BottleFieldRandomizer {
      * This constructor builds this bottle list randomizer with the default 
      * seed.
      */
-    public BottleFieldRandomizer() {
+    public RandomBottleListBuilder() {
         this(DEFAULT_SEED);
     }
     
@@ -60,14 +66,25 @@ public final class BottleFieldRandomizer {
         
         // Build non-empty bottles:
         for (int i = 0; i < numColors; ++i) {
-            Bottle bottle = new Bottle();
-            precolorBottle(bottle, Bottle.SectionColor.values()[i]);
-            bottleList.addBottle(bottle);
+            SectionColor color = Bottle.SectionColor.values()[i];
+            
+            if (color != NONE) {
+                Bottle bottle = new Bottle();
+                precolorBottle(bottle, Bottle.SectionColor.values()[i]);
+                bottleList.addBottle(bottle);
+            }
         }
         
-        // Add one empty bottle:
-        bottleList.addBottle(new Bottle());
+        // Add two empty bottle:
+        Bottle emptyBottle1 = new Bottle();
+        Bottle emptyBottle2 = new Bottle();
         
+        nonFullBottleList.add(emptyBottle1);
+        nonFullBottleList.add(emptyBottle2);
+        
+        bottleList.addBottle(emptyBottle1);
+        bottleList.addBottle(emptyBottle2);
+        System.out.println("Before: " + bottleList);
         pourRandomize(bottleList, pours);
         return bottleList;
     }
@@ -84,27 +101,42 @@ public final class BottleFieldRandomizer {
         }
     }
     
+    private Bottle findRandomBottle(BottleList bottleList) {
+        return bottleList.get(random.nextInt(bottleList.size()));
+    }
+    
     private void pourRandomize(BottleList bottleList, int pours) {
         for (int i = 0; i < pours; ++i) {
-            System.out.println("i == " + i);
-            Bottle sourceBottle = findNonEmptyBottle(bottleList);
-            
-            if (sourceBottle == null) {
-                continue;
-            }
-            
+            Bottle sourceBottle = findRandomBottle(bottleList);
             Bottle targetBottle = findNonFullBottle(bottleList);
             
             if (targetBottle == null) {
+                // Repeat this iteration:
+                --i;
                 continue;
             }
             
             int maximumPourSections = Math.min(sourceBottle.filledSections(),
                                                targetBottle.freeSections());
             
-            int actualPours = getActualPours(maximumPourSections);
+            if (maximumPourSections == 0) {
+                // Repeat this iteration:
+                --i;
+                continue;
+            }
             
-            sourceBottle.pourTo(targetBottle, actualPours);
+            sourceBottle.transferTo(targetBottle);
+            
+            nonFullBottleList.remove(sourceBottle);
+            nonFullBottleList.remove(targetBottle);
+            
+            if (!sourceBottle.isFull()) {
+                nonFullBottleList.add(sourceBottle);
+            }
+            
+            if (!targetBottle.isFull()) {
+                nonFullBottleList.add(targetBottle);
+            }
         }
     }
     
@@ -113,31 +145,7 @@ public final class BottleFieldRandomizer {
     }
     
     private Bottle findNonFullBottle(BottleList bottleList) {
-        List<Bottle> candidatesBottleList = new ArrayList<>();
-        
-        for (Bottle bottle : bottleList) {
-            if (!bottle.isFull()) {
-                candidatesBottleList.add(bottle);
-            }
-        }
-        
-        return candidatesBottleList.isEmpty() ? 
-                null : 
-                choose(candidatesBottleList, random);
-    }
-    
-    private Bottle findNonEmptyBottle(BottleList bottleList) {
-        List<Bottle> candidatesBottleList = new ArrayList<>();
-        
-        for (Bottle bottle : bottleList) {
-            if (!bottle.isEmpty()) {
-                candidatesBottleList.add(bottle);
-            }
-        }
-        
-        return choose(candidatesBottleList, random).isEmpty() ?
-                null :
-                choose(candidatesBottleList, random);
+        return nonFullBottleList.get(random.nextInt(nonFullBottleList.size()));
     }
     
     private static <T> T choose(List<T> list, Random random) {

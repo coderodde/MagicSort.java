@@ -2,11 +2,14 @@ package io.github.coderodde.magicsort;
 
 import static io.github.coderodde.magicsort.Bottle.SectionColor.NONE;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * This class implements the bottle in the Magic Sort game.
  */
 public final class Bottle {
+    
+    private static final Random RANDOM = new Random();
     
     /**
      * The number of sections per bottle.
@@ -25,7 +28,7 @@ public final class Bottle {
         BLUE           ("B"),
         LIGHT_BLUE     ("L"),
         VIOLET         ("V"),
-        BROWN          ("B"),
+        BROWN          ("W"),
         NAVY           ("N"),
         PINK           ("P");
         
@@ -68,7 +71,7 @@ public final class Bottle {
      * 
      * @return the total number of sections.
      */
-    public int totalSections() {
+    public static int totalSections() {
         return SECTIONS;
     }
     
@@ -130,6 +133,77 @@ public final class Bottle {
         filledSections++;
     }
     
+    public void transferTo(Bottle target) {
+        if (isEmpty()) {
+            return;
+        }
+        
+        SectionColor color = getTopmostSectionColor();
+        int count = 1;
+        
+        for (int i = 1; i < filledSections(); ++i) {
+            SectionColor tentativeColor = getSectionColor(i);
+            
+            if (tentativeColor != color) {
+                break;
+            }
+            
+            ++count;
+        }
+        
+        count = Math.min(count, target.freeSections());
+        count = randomizeCount(count);
+        
+        for (int i = 0; i < count; ++i) {
+            target.push(pop());
+        }
+    }
+    
+    private static int randomizeCount(int maxCount) {
+        switch (maxCount) {
+            case 0:
+                return 0;
+            case 1:
+                return 1;
+                
+            case 2:
+                return 1 + RANDOM.nextInt(maxCount);
+                
+            case 3:
+                double coin = RANDOM.nextDouble();
+                
+                if (coin < 0.2) {
+                    return 1;
+                }
+                
+                if (coin < 0.5) {
+                    return 2;
+                }
+                
+                return 3;
+                
+            case 4:
+                coin = RANDOM.nextDouble();
+                
+                if (coin < 0.1) {
+                    return 1;
+                }
+                
+                if (coin < 0.25) {
+                    return 2;
+                }
+                
+                if (coin < 0.5) {
+                    return 4;
+                }
+                
+                return 3;
+                
+            default:
+                throw new IllegalStateException("Should not get here.");
+        }
+    }
+
     public void pourTo(Bottle target, int numSections) {
         numSections = Math.min(numSections, target.freeSections());
         numSections = Math.min(numSections, filledSections());
@@ -140,8 +214,9 @@ public final class Bottle {
         }
         
         SectionColor color = getTopmostSectionColor();
+        SectionColor targetColor = target.getTopmostSectionColor();
         
-        if (color != target.getTopmostSectionColor()) {
+        if (color != targetColor && targetColor != NONE) {
             // Topmost section colors mismatch:
             return;
         }

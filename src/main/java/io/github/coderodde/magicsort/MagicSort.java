@@ -11,7 +11,7 @@ public final class MagicSort {
     }
     
     public static void main(String[] args) {
-        BottleList bottleList = new BottleFieldRandomizer().randomize(20);
+        BottleList bottleList = new RandomBottleListBuilder().randomize(50);
         
         System.out.println(bottleList);
     }
