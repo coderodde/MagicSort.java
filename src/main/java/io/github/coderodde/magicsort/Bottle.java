@@ -64,6 +64,17 @@ public final class Bottle {
     }
     
     /**
+     * The copy-constructor.
+     * 
+     * @param bottle the bottle to copy.
+     */
+    public Bottle(Bottle bottle) {
+        for (int i = 0; i < totalSections(); ++i) {
+            sections[i] = bottle.sections[i];
+        }
+    }
+    
+    /**
      * Returns the section color of the {@code index}th section. The {@code 0}th
      * section is the topmost non-empty section.
      * 

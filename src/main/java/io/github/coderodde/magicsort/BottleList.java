@@ -17,6 +17,24 @@ public final class BottleList implements Iterable<Bottle> {
     private final List<Bottle> bottleList = new ArrayList<>();
     
     /**
+     * Constructs an empty bottle list.
+     */
+    public BottleList() {
+        
+    }
+    
+    /**
+     * The copy-constructor.
+     * 
+     * @param bottleList the bottle list to copy.
+     */
+    public BottleList(BottleList bottleList) {
+        for (Bottle bottle : bottleList) {
+            this.bottleList.add(new Bottle(bottle));
+        }
+    }
+    
+    /**
      * Adds a bottle into this bottle list.
      * 
      * @param bottle the bottle to add. 
@@ -44,6 +62,28 @@ public final class BottleList implements Iterable<Bottle> {
      */
     public Bottle get(int index) {
         return bottleList.get(index);
+    }
+    
+    public List<BottleList> generateNeighbors() {
+        List<BottleList> neighbors = new ArrayList();
+        
+        for (int i = 0; i < size(); ++i) {
+            for (int j = 0; j < size(); ++j) {
+                if (i == j) {
+                    continue;
+                }
+                
+                BottleList bottleList = new BottleList(this);
+                Bottle source = bottleList.get(i);
+                Bottle target = bottleList.get(j);
+                
+                
+                
+                neighbors.add(bottleList);
+            }
+        }
+        
+        return neighbors;
     }
     
     /**
