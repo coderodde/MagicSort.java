@@ -9,6 +9,8 @@ import java.util.Random;
  */
 public final class Bottle {
     
+    private static final int[] HASH_CODE_MULTIPLIERS = { 47, -32, 15, 77 };
+    
     private static final Random RANDOM = new Random();
     
     /**
@@ -20,22 +22,28 @@ public final class Bottle {
      * This enumeration specifies all the valid section colours.
      */
     public enum SectionColor {
-        NONE           ("x"),
-        RED            ("R"),
-        ORANGE         ("O"),
-        YELLOW         ("Y"),
-        GREEN          ("G"),
-        BLUE           ("B"),
-        LIGHT_BLUE     ("L"),
-        VIOLET         ("V"),
-        BROWN          ("W"),
-        NAVY           ("N"),
-        PINK           ("P");
+        NONE           ("x", 2),
+        RED            ("R", 3),
+        ORANGE         ("O", 5),
+        YELLOW         ("Y", 7),
+        GREEN          ("G", 11),
+        BLUE           ("B", 13),
+        LIGHT_BLUE     ("L", 17),
+        VIOLET         ("V", 19),
+        BROWN          ("W", 23),
+        NAVY           ("N", 29),
+        PINK           ("P", 31);
         
         private final String name;
+        private final int hashc;
         
-        private SectionColor(String name) {
+        private SectionColor(String name, int hashc) {
             this.name = name;
+            this.hashc = hashc;
+        }
+        
+        public int getHashCode() {
+            return hashc;
         }
         
         @Override
@@ -233,6 +241,17 @@ public final class Bottle {
     }
     
     @Override
+    public int hashCode() {
+        int hash = 13;
+        
+        for (int i = 0; i < SECTIONS; ++i) {
+            hash += HASH_CODE_MULTIPLIERS[i] * sections[i].getHashCode();
+        }
+        
+        return hash;
+    }
+    
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder().append("{");
         
@@ -241,5 +260,24 @@ public final class Bottle {
         }
         
         return sb.append("]").toString();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Bottle b) {
+            if (freeSections() != b.freeSections()) {
+                return false;
+            }
+            
+            for (int i = 0; i < filledSections(); ++i) {
+                if (getSectionColor(i) != b.getSectionColor(i)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
 }

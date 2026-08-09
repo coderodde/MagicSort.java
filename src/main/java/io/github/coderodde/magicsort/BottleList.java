@@ -97,4 +97,18 @@ public final class BottleList implements Iterable<Bottle> {
     public String toString() {
         return bottleList.toString();
     }
+    
+    @Override
+    public int hashCode() {
+        return bottleList.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof BottleList bl) {
+            return bottleList.equals(bl.bottleList);
+        }
+        
+        return false;
+    }
 }
