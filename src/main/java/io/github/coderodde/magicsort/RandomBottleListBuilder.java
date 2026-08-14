@@ -125,7 +125,7 @@ public final class RandomBottleListBuilder {
                 continue;
             }
             
-            sourceBottle.transferTo(targetBottle);
+            sourceBottle.transferTo(targetBottle, random);
             
             nonFullBottleList.remove(sourceBottle);
             nonFullBottleList.remove(targetBottle);

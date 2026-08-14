@@ -11,8 +11,6 @@ public final class Bottle {
     
     private static final int[] HASH_CODE_MULTIPLIERS = { 47, -32, 15, 77 };
     
-    private static final Random RANDOM = new Random();
-    
     /**
      * The number of sections per bottle.
      */
@@ -52,7 +50,7 @@ public final class Bottle {
         }
     }
     
-    // The sections[0] is the topmost section, the sections[3] is at the bottom:
+    // The sections[3] is the topmost section, the sections[0] is at the bottom:
     private final SectionColor[] sections = new SectionColor[SECTIONS];
     private int filledSections = 0;
     
@@ -82,7 +80,7 @@ public final class Bottle {
      * @return the section color of the {@code index}th section.
      */
     public SectionColor getSectionColor(int index) {
-        return sections[index + freeSections()];
+        return sections[filledSections() - 1 - index];
     }
     
     /**
@@ -135,24 +133,20 @@ public final class Bottle {
             return NONE;
         }
         
-        return sections[SECTIONS - filledSections()];
+        return getSectionColor(0);
     }
     
     public SectionColor pop() {
-        int targetSectionIndex          = freeSections();
-        SectionColor color              = sections[targetSectionIndex];
-        sections[targetSectionIndex]    = SectionColor.NONE;
-        filledSections--;
+        SectionColor color = getSectionColor(0);
+        --filledSections;
         return color;
     }
     
     public void push(SectionColor color) {
-        int targetSectionIndex = freeSections() - 1;
-        sections[targetSectionIndex] = color;
-        filledSections++;
+        sections[filledSections++] = color;
     }
     
-    public void transferTo(Bottle target) {
+    public void transferTo(Bottle target, Random random) {
         if (isEmpty()) {
             return;
         }
@@ -171,14 +165,14 @@ public final class Bottle {
         }
         
         count = Math.min(count, target.freeSections());
-        count = randomizeCount(count);
+        count = randomizeCount(count, random);
         
         for (int i = 0; i < count; ++i) {
             target.push(pop());
         }
     }
     
-    private static int randomizeCount(int maxCount) {
+    private static int randomizeCount(int maxCount, Random random) {
         switch (maxCount) {
             case 0:
                 return 0;
@@ -186,10 +180,10 @@ public final class Bottle {
                 return 1;
                 
             case 2:
-                return 1 + RANDOM.nextInt(maxCount);
+                return 1 + random.nextInt(maxCount);
                 
             case 3:
-                double coin = RANDOM.nextDouble();
+                double coin = random.nextDouble();
                 
                 if (coin < 0.2) {
                     return 1;
@@ -202,7 +196,7 @@ public final class Bottle {
                 return 3;
                 
             case 4:
-                coin = RANDOM.nextDouble();
+                coin = random.nextDouble();
                 
                 if (coin < 0.1) {
                     return 1;
@@ -244,6 +238,7 @@ public final class Bottle {
             SectionColor clr = pop();
             
             if (clr != color) {
+                push(clr);
                 return;
             }
             
@@ -290,5 +285,62 @@ public final class Bottle {
         }
         
         return false;
+    }
+    
+    public static int maxPours(Bottle source, Bottle target) {
+        int maxPours = Math.min(source.filledSections(), target.freeSections());
+        
+        if (maxPours == 0) {
+            return 0;
+        }
+        
+        SectionColor sourceColor = source.getTopmostSectionColor();
+        SectionColor targetColor = target.getTopmostSectionColor();
+        
+        if (sourceColor != targetColor) {
+            return 0;
+        }
+        
+        for (int i = 1; i < maxPours; ++i) {
+            SectionColor tentativeSourceColor = source.getSectionColor(i);
+            SectionColor tentativeTargetColor = target.getSectionColor(i);
+            
+            // Here, sourceColor and targetColor are equal:
+            if (tentativeSourceColor != sourceColor ||
+                tentativeTargetColor != sourceColor) {
+                return i;
+            }
+        }
+        
+        return maxPours;
+    }
+    
+    static BottlePair pour(Bottle source, Bottle target, int pours) {
+        Bottle a = new Bottle(source);
+        Bottle b = new Bottle(target);
+        
+        for (int i = 0; i <  pours; ++i) {
+            b.push(a.pop());
+        }
+        
+        return new BottlePair(a, b);
+    }
+    
+    static final class BottlePair {
+        private final Bottle bottleA;
+        private final Bottle bottleB;
+        
+        BottlePair(Bottle bottleA, Bottle bottleB) {
+            this.bottleA = bottleA;
+            this.bottleB = bottleB;
+        }
+        
+        Bottle bottleA() {
+            return bottleA;
+        }
+        
+        Bottle bottleB() {
+            return bottleB;
+        }
     }
 }

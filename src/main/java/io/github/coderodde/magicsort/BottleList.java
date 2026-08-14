@@ -1,5 +1,6 @@
 package io.github.coderodde.magicsort;
 
+import io.github.coderodde.magicsort.Bottle.BottlePair;
 import io.github.coderodde.magicsort.Bottle.SectionColor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -64,6 +65,21 @@ public final class BottleList implements Iterable<Bottle> {
         return bottleList.get(index);
     }
     
+    /**
+     * Resets a particular bottle in the list.
+     * 
+     * @param index  the location index.
+     * @param bottle the bottle to set.
+     */
+    public void set(int index, Bottle bottle) {
+        bottleList.set(index, bottle);
+    }
+    
+    /**
+     * Computes and returns the list of neighbouring bottle lists.
+     * 
+     * @return the list of neighbouring bottle lists.
+     */
     public List<BottleList> generateNeighbors() {
         List<BottleList> neighbors = new ArrayList();
         
@@ -73,13 +89,18 @@ public final class BottleList implements Iterable<Bottle> {
                     continue;
                 }
                 
-                BottleList bottleList = new BottleList(this);
                 Bottle source = bottleList.get(i);
                 Bottle target = bottleList.get(j);
                 
+                int maxPours = Bottle.maxPours(source, target);
                 
-                
-                neighbors.add(bottleList);
+                for (int p = 1; p <= maxPours; ++p) {
+                    BottleList bottleList = new BottleList(this);
+                    BottlePair pair = Bottle.pour(source, target, p);
+                    bottleList.set(i, pair.bottleA());
+                    bottleList.set(j, pair.bottleB());
+                    neighbors.add(bottleList);
+                }
             }
         }
         
