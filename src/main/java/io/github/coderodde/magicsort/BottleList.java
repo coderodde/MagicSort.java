@@ -80,8 +80,8 @@ public final class BottleList implements Iterable<Bottle> {
      * 
      * @return the list of neighbouring bottle lists.
      */
-    public List<BottleList> generateNeighbors() {
-        List<BottleList> neighbors = new ArrayList();
+    public List<BottleListNeighbourhood> generateNeighbors() {
+        List<BottleListNeighbourhood> neighbors = new ArrayList();
         
         for (int i = 0; i < size(); ++i) {
             for (int j = 0; j < size(); ++j) {
@@ -95,11 +95,17 @@ public final class BottleList implements Iterable<Bottle> {
                 int maxPours = Bottle.maxPours(source, target);
                 
                 for (int p = 1; p <= maxPours; ++p) {
-                    BottleList bottleList = new BottleList(this);
+                    BottleList neighbourBottleList = new BottleList(this);
                     BottlePair pair = Bottle.pour(source, target, p);
-                    bottleList.set(i, pair.bottleA());
-                    bottleList.set(j, pair.bottleB());
-                    neighbors.add(bottleList);
+                    neighbourBottleList.set(i, pair.bottleA());
+                    neighbourBottleList.set(j, pair.bottleB());
+                    neighbors.add(
+                        new BottleListNeighbourhood(
+//                            this,       // source bottle list
+                            neighbourBottleList, // target bottle list
+                            i,          // source bottle index
+                            j,          // target bottle index
+                            p));        // number of pours
                 }
             }
         }
@@ -136,9 +142,13 @@ public final class BottleList implements Iterable<Bottle> {
             return true;
         }
         
+        if (!bottle.isFull()) {
+            return false;
+        }
+        
         SectionColor expectedColor = bottle.getTopmostSectionColor();
         
-        for (int i = 0; i < bottle.filledSections(); ++i) {
+        for (int i = 0; i < Bottle.totalSections(); ++i) {
             SectionColor currentColor = bottle.getSectionColor(i);
             
             if (currentColor != expectedColor) {
@@ -171,5 +181,47 @@ public final class BottleList implements Iterable<Bottle> {
         }
         
         return false;
+    }
+    
+    public static final class BottleListNeighbourhood {
+//        public final BottleList sourceBottleList;
+        public final BottleList targetBottleList;
+        public final int sourceBottleIndex;
+        public final int targetBottleIndex;
+        public final int pours;
+        
+        public BottleListNeighbourhood(//BottleList sourceBottleList,
+                                       BottleList targetBottleList,
+                                       int sourceBottleIndex,
+                                       int targetBottleIndex,
+                                       int pours) {
+//            this.sourceBottleList  = sourceBottleList;
+            this.targetBottleList  = targetBottleList;
+            this.sourceBottleIndex = sourceBottleIndex;
+            this.targetBottleIndex = targetBottleIndex;
+            this.pours             = pours;
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof BottleListNeighbourhood other) {
+                return targetBottleList.equals(other.targetBottleList)
+                    && sourceBottleIndex == other.sourceBottleIndex 
+                    && targetBottleIndex == other.targetBottleIndex
+                    && pours == other.pours;
+            }
+            
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 71 * hash + Objects.hashCode(targetBottleList);
+            hash = 71 * hash + sourceBottleIndex;
+            hash = 71 * hash + targetBottleIndex;
+            hash = 71 * hash + pours;
+            return hash;
+        }
     }
 }
