@@ -1,5 +1,6 @@
 package io.github.coderodde.magicsort;
 
+import io.github.coderodde.magicsort.MagicSortSolver.SearchResult;
 import java.util.List;
 
 /**
@@ -24,19 +25,22 @@ public final class MagicSort {
         System.out.println("Starting configuration:");
         System.out.println(bottleList);
         
+        System.out.println();
+        
         long ta = System.currentTimeMillis();
-        List<MagicSortTransition> path1 = 
-            new BFSMagicSortSolver().solve(bottleList);
+        SearchResult data1 = new BFSMagicSortSolver().solve(bottleList);
         long tb = System.currentTimeMillis();
         
         System.out.println("BFS path:");
         
-        printPath(path1);
+        printPath(data1.transitions());
+        System.out.println("BFS expanded states: " + data1.expandedStates());
+        System.out.println("BFS visited states : " + data1.visitedStates());
         
         System.out.printf("BFS duration: %d ms.\n", tb - ta);
         
         ta = System.currentTimeMillis();
-        List<MagicSortTransition> path2 = 
+        SearchResult data2 = 
             new DFSMagicSortSolver().solve(bottleList);
         tb = System.currentTimeMillis();
         
@@ -44,14 +48,20 @@ public final class MagicSort {
         
         System.out.println("DFS path:");
         
-        printPath(path2);
+        printPath(data2.transitions());
+        
+        System.out.println("DFS expanded states: " + data2.expandedStates());
+        System.out.println("DFS visited states : " + data2.visitedStates());
         
         System.out.printf("DFS duration: %d ms.\n", tb - ta);
         
         System.out.println();
         
-        System.out.println("BFS path valid: " + isValidPath(bottleList, path1));
-        System.out.println("DFS path valid: " + isValidPath(bottleList, path2));
+        System.out.println(
+            "BFS path valid: " + isValidPath(bottleList, data1.transitions()));
+        
+        System.out.println(
+            "DFS path valid: " + isValidPath(bottleList, data2.transitions()));
     }
     
     private static boolean isValidPath(BottleList startState,

@@ -14,7 +14,7 @@ import java.util.Map;
 public final class BFSMagicSortSolver implements MagicSortSolver {
 
     @Override
-    public List<MagicSortTransition> solve(BottleList startState) {
+    public SearchResult solve(BottleList startState) {
         Deque<BottleList> q = new ArrayDeque<>(List.of(startState));
         Map<BottleList, BottleList>      p = new HashMap<>();
         Map<BottleList, StateTransition> t = new HashMap<>();
@@ -22,11 +22,18 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
         p.put(startState, null);
         t.put(startState, null);
         
+        int expandedStates = 0;
+        
         while (!q.isEmpty()) {
             BottleList state = q.removeFirst();
             
+            ++expandedStates;
+            
             if (state.isSolved()) {
-                return generateTransitions(state, p, t);
+                List<MagicSortTransition> path = 
+                    generateTransitions(state, p, t);
+                
+                return new SearchResult(path, expandedStates, p.size());
             }
             
             for (StateTransition transition : state.generateNeighbors()) {
@@ -50,6 +57,6 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
             }
         }
         
-        return List.of();
+        return new SearchResult(List.of(), -1, -1);
     }
 }

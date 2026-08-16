@@ -18,7 +18,7 @@ public sealed interface MagicSortSolver permits BFSMagicSortSolver,
      * @return a path of state transitions. If the search fails, empty list is
      *         returned.
      */
-    public List<MagicSortTransition> solve(BottleList startState);
+    public SearchResult solve(BottleList startState);
     
     static List<MagicSortTransition>
          generateTransitions(
@@ -61,5 +61,10 @@ public sealed interface MagicSortSolver permits BFSMagicSortSolver,
         }
         
         return bl;
+    }
+        
+    public final record SearchResult(List<MagicSortTransition> transitions,
+                                     int expandedStates,
+                                     int visitedStates) {
     }
 }
