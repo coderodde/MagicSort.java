@@ -96,13 +96,6 @@ public final class RandomBottleListBuilder {
             
             Bottle targetBottle = findNonFullBottle();
             
-            if (targetBottle == null) {
-                System.out.println("oops!");
-                // Repeat this iteration:
-                --i;
-                continue;
-            }
-            
             int maximumPourSections = Math.min(sourceBottle.filledSections(),
                                                targetBottle.freeSections());
             

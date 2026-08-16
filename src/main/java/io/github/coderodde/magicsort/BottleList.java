@@ -91,7 +91,7 @@ public final class BottleList implements Iterable<Bottle> {
                 
                 Bottle sourceBottle = bottleList.get(i);
                 Bottle targetBottle = bottleList.get(j);
-//                System.out.println("[" + i + ", " + j + "]");
+                
                 int maxPours = Bottle.maxPours(sourceBottle, targetBottle);
                 
                 for (int p = 1; p <= maxPours; ++p) {

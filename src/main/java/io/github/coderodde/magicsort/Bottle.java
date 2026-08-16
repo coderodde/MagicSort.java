@@ -83,12 +83,6 @@ public final class Bottle {
      * @return the section color of the {@code index}th section.
      */
     public SectionColor getSectionColor(int index) {
-        int idx = filledSections() - 1 - index;
-        
-//        if (idx < 0) {
-//            System.out.println("yeah");
-//        }
-        
         return sections[filledSections() - 1 - index];
     }
     

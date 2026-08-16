@@ -1,8 +1,6 @@
 package io.github.coderodde.magicsort;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This interface defines the API for the Magic Sort solvers.
