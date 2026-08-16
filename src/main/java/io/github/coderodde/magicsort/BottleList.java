@@ -104,6 +104,8 @@ public final class BottleList implements Iterable<Bottle> {
                             nextBottleList, // The next bottle list
                             sourceBottle,   // The source bottle
                             targetBottle,   // The target bottle
+                            i,              // The source bottle index
+                            j,              // The target bottle index
                             p));            // The pour section count
                 }
             }
@@ -180,5 +182,15 @@ public final class BottleList implements Iterable<Bottle> {
         }
         
         return false;
+    }
+
+    BottleList applyTransition(MagicSortTransition t) {
+        BottleList bl = new BottleList(this);
+        Bottle source = t.source();
+        Bottle target = t.target();
+        source.pourTo(target, t.pours());
+        bl.set(t.sourceIndex(), source);
+        bl.set(t.targetIndex(), target);
+        return bl;
     }
 }

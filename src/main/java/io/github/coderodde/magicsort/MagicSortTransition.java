@@ -5,6 +5,8 @@ package io.github.coderodde.magicsort;
  */
 public final record MagicSortTransition(Bottle source,
                                         Bottle target,
+                                        int sourceIndex,
+                                        int targetIndex,
                                         int pours) {
     
     @Override

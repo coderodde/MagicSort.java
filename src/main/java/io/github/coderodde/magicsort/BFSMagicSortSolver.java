@@ -1,7 +1,7 @@
 package io.github.coderodde.magicsort;
 
+import static io.github.coderodde.magicsort.MagicSortSolver.generateTransitions;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -36,46 +36,20 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
                     p.put(nextState, state);
                     q.addLast(nextState);
                     
-                    MagicSortTransition magicSortTransition = 
-                        new MagicSortTransition(
+                    StateTransition stateTransition = 
+                        new StateTransition(
+                            nextState,
                             transition.sourceBottle(),
                             transition.targetBottle(),
+                            transition.sourceBottleIndex(),
+                            transition.targetBottleIndex(),
                             transition.pours());
                     
-                    t.put(nextState, transition);
+                    t.put(nextState, stateTransition);
                 }
             }
         }
         
         return List.of();
-    }
-    
-    private static List<MagicSortTransition>
-         generateTransitions(
-             BottleList goal, 
-             Map<BottleList, BottleList> parents,
-             Map<BottleList, StateTransition> transitions) {
-        
-        List<MagicSortTransition> result = new ArrayList<>();
-        BottleList current = goal;
-        
-        while (true) {
-            StateTransition transition = transitions.get(current);
-            
-            if (transition == null) {
-                break;
-            }
-            
-            MagicSortTransition magicSortTransition = 
-                new MagicSortTransition(
-                    transition.sourceBottle(), 
-                    transition.targetBottle(), 
-                    transition.pours());
-            
-            result.add(magicSortTransition);
-            current = parents.get(current);
-        }
-        
-        return result.reversed();
     }
 }

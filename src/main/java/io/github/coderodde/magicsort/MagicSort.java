@@ -47,6 +47,19 @@ public final class MagicSort {
         printPath(path2);
         
         System.out.printf("DFS duration: %d ms.\n", tb - ta);
+        
+        System.out.println();
+        
+        System.out.println("BFS path valid: " + isValidPath(bottleList, path1));
+        System.out.println("DFS path valid: " + isValidPath(bottleList, path2));
+    }
+    
+    private static boolean isValidPath(BottleList startState,
+                                       List<MagicSortTransition> transitions) {
+        BottleList goalState = MagicSortSolver.applyTransitions(startState, 
+                                                                transitions);
+        
+        return goalState.isSolved();
     }
     
     private static void printPath(List<MagicSortTransition> path) {

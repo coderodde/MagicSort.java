@@ -7,6 +7,8 @@ package io.github.coderodde.magicsort;
 public final record StateTransition(BottleList nextBottleList,
                                     Bottle sourceBottle,
                                     Bottle targetBottle,
+                                    int sourceBottleIndex,
+                                    int targetBottleIndex,
                                     int pours) {
     
 }

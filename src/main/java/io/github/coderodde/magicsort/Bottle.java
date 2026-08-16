@@ -133,8 +133,7 @@ public final class Bottle {
     
     public SectionColor getTopmostSectionColor() {
         if (isEmpty()) {
-            throw new NoSuchElementException(
-                "Cannot get the topmost section color. The bottle is empty.");
+            return NONE;
         }
         
         return getSectionColor(0);
