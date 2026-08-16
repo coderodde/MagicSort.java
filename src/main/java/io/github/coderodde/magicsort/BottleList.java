@@ -80,8 +80,8 @@ public final class BottleList implements Iterable<Bottle> {
      * 
      * @return the list of neighbouring bottle lists.
      */
-    public List<BottleListNeighbourhood> generateNeighbors() {
-        List<BottleListNeighbourhood> neighbors = new ArrayList();
+    public List<StateTransition> generateNeighbors() {
+        List<StateTransition> stateTransitionList = new ArrayList();
         
         for (int i = 0; i < size(); ++i) {
             for (int j = 0; j < size(); ++j) {
@@ -89,28 +89,27 @@ public final class BottleList implements Iterable<Bottle> {
                     continue;
                 }
                 
-                Bottle source = bottleList.get(i);
-                Bottle target = bottleList.get(j);
+                Bottle sourceBottle = bottleList.get(i);
+                Bottle targetBottle = bottleList.get(j);
                 
-                int maxPours = Bottle.maxPours(source, target);
+                int maxPours = Bottle.maxPours(sourceBottle, targetBottle);
                 
                 for (int p = 1; p <= maxPours; ++p) {
-                    BottleList neighbourBottleList = new BottleList(this);
-                    BottlePair pair = Bottle.pour(source, target, p);
-                    neighbourBottleList.set(i, pair.bottleA());
-                    neighbourBottleList.set(j, pair.bottleB());
-                    neighbors.add(
-                        new BottleListNeighbourhood(
-//                            this,       // source bottle list
-                            neighbourBottleList, // target bottle list
-                            i,          // source bottle index
-                            j,          // target bottle index
-                            p));        // number of pours
+                    BottleList nextBottleList = new BottleList(this);
+                    BottlePair pair = Bottle.pour(sourceBottle, targetBottle, p);
+                    nextBottleList.set(i, pair.bottleA());
+                    nextBottleList.set(j, pair.bottleB());
+                    stateTransitionList.add(
+                        new StateTransition(
+                            nextBottleList, // The next bottle list
+                            sourceBottle,   // The source bottle
+                            targetBottle,   // The target bottle
+                            p));            // The pour section count
                 }
             }
         }
         
-        return neighbors;
+        return stateTransitionList;
     }
     
     /**
