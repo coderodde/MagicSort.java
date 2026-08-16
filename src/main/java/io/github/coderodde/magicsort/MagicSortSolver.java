@@ -5,7 +5,8 @@ import java.util.List;
 /**
  * This interface defines the API for the Magic Sort solvers.
  */
-public sealed interface MagicSortSolver permits BFSMagicSortSolver {
+public sealed interface MagicSortSolver permits BFSMagicSortSolver,
+                                                DFSMagicSortSolver {
     
     /**
      * Attempts to solve the {@code startState}.
