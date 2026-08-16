@@ -21,6 +21,7 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
        
         p.put(startState, null);
         t.put(startState, null);
+        
         int it = 0;
         while (!q.isEmpty()) {
             BottleList state = q.removeFirst();
@@ -29,7 +30,7 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
                 return generateTransitions(state, p, t);
             }
             
-            System.out.println("it = " + it);
+//            System.out.println("it = " + it);
             it++;
             
             for (StateTransition transition : state.generateNeighbors()) {
@@ -38,6 +39,14 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
                 if (!p.containsKey(nextState)) {
                     p.put(nextState, state);
                     q.addLast(nextState);
+                    
+                    MagicSortTransition magicSortTransition = 
+                        new MagicSortTransition(
+                            transition.sourceBottle(),
+                            transition.targetBottle(),
+                            transition.pours());
+                    
+                    t.put(nextState, transition);
                 }
             }
         }
@@ -54,8 +63,12 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
         List<MagicSortTransition> result = new ArrayList<>();
         BottleList current = goal;
         
-        while (current != null) {
+        while (true) {
             StateTransition transition = transitions.get(current);
+            
+            if (transition == null) {
+                break;
+            }
             
             MagicSortTransition magicSortTransition = 
                 new MagicSortTransition(
