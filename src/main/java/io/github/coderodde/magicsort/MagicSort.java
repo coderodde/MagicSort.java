@@ -31,11 +31,11 @@ public final class MagicSort {
         
         System.out.println("BFS path:");
         
-        String fmt = 
-            String.format("%%%d: %%s\n", ("" + path1.size()).length());
+        int width = Integer.toString(path1.size()).length();
+        String format = "%" + width + "d: %s%n";
         
         for (int i = 1; i <= path1.size(); ++i) {
-            System.out.printf(fmt, i, path1.get(i - 1));
+            System.out.printf(format, i, path1.get(i - 1));
         }
         
         System.out.printf("BFS duration: %d ms.\n", tb - ta);
