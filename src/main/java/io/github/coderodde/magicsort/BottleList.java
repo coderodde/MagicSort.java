@@ -181,46 +181,4 @@ public final class BottleList implements Iterable<Bottle> {
         
         return false;
     }
-    
-    public static final class BottleListNeighbourhood {
-//        public final BottleList sourceBottleList;
-        public final BottleList targetBottleList;
-        public final int sourceBottleIndex;
-        public final int targetBottleIndex;
-        public final int pours;
-        
-        public BottleListNeighbourhood(//BottleList sourceBottleList,
-                                       BottleList targetBottleList,
-                                       int sourceBottleIndex,
-                                       int targetBottleIndex,
-                                       int pours) {
-//            this.sourceBottleList  = sourceBottleList;
-            this.targetBottleList  = targetBottleList;
-            this.sourceBottleIndex = sourceBottleIndex;
-            this.targetBottleIndex = targetBottleIndex;
-            this.pours             = pours;
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof BottleListNeighbourhood other) {
-                return targetBottleList.equals(other.targetBottleList)
-                    && sourceBottleIndex == other.sourceBottleIndex 
-                    && targetBottleIndex == other.targetBottleIndex
-                    && pours == other.pours;
-            }
-            
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 71 * hash + Objects.hashCode(targetBottleList);
-            hash = 71 * hash + sourceBottleIndex;
-            hash = 71 * hash + targetBottleIndex;
-            hash = 71 * hash + pours;
-            return hash;
-        }
-    }
 }

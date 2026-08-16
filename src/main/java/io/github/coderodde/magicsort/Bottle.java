@@ -2,6 +2,7 @@ package io.github.coderodde.magicsort;
 
 import static io.github.coderodde.magicsort.Bottle.SectionColor.NONE;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 /**
@@ -67,6 +68,8 @@ public final class Bottle {
      * @param bottle the bottle to copy.
      */
     public Bottle(Bottle bottle) {
+        this.filledSections = bottle.filledSections;
+        
         for (int i = 0; i < totalSections(); ++i) {
             sections[i] = bottle.sections[i];
         }
@@ -130,7 +133,8 @@ public final class Bottle {
     
     public SectionColor getTopmostSectionColor() {
         if (isEmpty()) {
-            return NONE;
+            throw new NoSuchElementException(
+                "Cannot get the topmost section color. The bottle is empty.");
         }
         
         return getSectionColor(0);
@@ -138,7 +142,7 @@ public final class Bottle {
     
     public SectionColor pop() {
         SectionColor color = getSectionColor(0);
-        --filledSections;
+        sections[--filledSections] = NONE;
         return color;
     }
     
@@ -259,10 +263,10 @@ public final class Bottle {
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder().append("{");
+        StringBuilder sb = new StringBuilder().append("={");
         
-        for (SectionColor sectionColor : sections) {
-            sb.append(sectionColor);
+        for (int i = Bottle.SECTIONS - 1; i >= 0; --i) {
+            sb.append(sections[i]);
         }
         
         return sb.append("]").toString();
@@ -295,6 +299,15 @@ public final class Bottle {
         }
         
         SectionColor sourceColor = source.getTopmostSectionColor();
+        
+        if (target.isEmpty()) {
+            return source.filledSections();
+        }
+        
+        if (target.isFull()) {
+            return 0;
+        }
+        
         SectionColor targetColor = target.getTopmostSectionColor();
         
         if (sourceColor != targetColor) {

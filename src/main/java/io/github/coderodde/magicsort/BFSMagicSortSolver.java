@@ -21,13 +21,16 @@ public final class BFSMagicSortSolver implements MagicSortSolver {
        
         p.put(startState, null);
         t.put(startState, null);
-        
+        int it = 0;
         while (!q.isEmpty()) {
             BottleList state = q.removeFirst();
             
             if (state.isSolved()) {
                 return generateTransitions(state, p, t);
             }
+            
+            System.out.println("it = " + it);
+            it++;
             
             for (StateTransition transition : state.generateNeighbors()) {
                 BottleList nextState = transition.nextBottleList();

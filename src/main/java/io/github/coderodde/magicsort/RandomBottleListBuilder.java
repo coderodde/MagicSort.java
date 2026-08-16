@@ -59,46 +59,25 @@ public final class RandomBottleListBuilder {
      * 
      * @return a randomized bottle list.
      */
-    public BottleList randomize(int pours) {
+    public BottleList randomize(int fullBottles, int emptyBottles, int pours) {
         BottleList bottleList = new BottleList();
         
-        int numColors = Bottle.SectionColor.values().length;
-        
-        // Build non-empty bottles:
-        for (int i = 0; i < numColors; ++i) {
-            SectionColor color = Bottle.SectionColor.values()[i];
-            
-            if (color != NONE) {
-                Bottle bottle = new Bottle();
-                precolorBottle(bottle, Bottle.SectionColor.values()[i]);
-                bottleList.addBottle(bottle);
-            }
+        // Create full bottles:
+        for (int i = 0; i < fullBottles; ++i) {
+            Bottle b = new Bottle();
+            colorBottleRandomly(b);
+            bottleList.addBottle(b);
         }
         
-        // Add two empty bottle:
-        Bottle emptyBottle1 = new Bottle();
-        Bottle emptyBottle2 = new Bottle();
+        // Create empty bottles:
+        for (int i = 0; i < emptyBottles; ++i) {
+            Bottle b = new Bottle();
+            nonFullBottleList.add(b);
+            bottleList.addBottle(b);
+        }
         
-        nonFullBottleList.add(emptyBottle1);
-        nonFullBottleList.add(emptyBottle2);
-        
-        bottleList.addBottle(emptyBottle1);
-        bottleList.addBottle(emptyBottle2);
-        System.out.println("Before: " + bottleList);
         pourRandomize(bottleList, pours);
         return bottleList;
-    }
-    
-    /**
-     * Fills the input bottle entirely with the input section color.
-     * 
-     * @param bottle the target bottle.
-     * @param color  the target color.
-     */
-    private void precolorBottle(Bottle bottle, SectionColor color) {
-        for (int i = 0; i < bottle.totalSections(); ++i) {
-            bottle.push(color);
-        }
     }
     
     private Bottle findRandomBottle(BottleList bottleList) {
@@ -108,9 +87,17 @@ public final class RandomBottleListBuilder {
     private void pourRandomize(BottleList bottleList, int pours) {
         for (int i = 0; i < pours; ++i) {
             Bottle sourceBottle = findRandomBottle(bottleList);
-            Bottle targetBottle = findNonFullBottle(bottleList);
+            
+            if (sourceBottle.isEmpty()) {
+                // Repeat this iteration:
+                --i;
+                continue;
+            }
+            
+            Bottle targetBottle = findNonFullBottle();
             
             if (targetBottle == null) {
+                System.out.println("oops!");
                 // Repeat this iteration:
                 --i;
                 continue;
@@ -125,10 +112,10 @@ public final class RandomBottleListBuilder {
                 continue;
             }
             
-            sourceBottle.transferTo(targetBottle, random);
-            
             nonFullBottleList.remove(sourceBottle);
             nonFullBottleList.remove(targetBottle);
+            
+            sourceBottle.transferTo(targetBottle, random);
             
             if (!sourceBottle.isFull()) {
                 nonFullBottleList.add(sourceBottle);
@@ -140,15 +127,16 @@ public final class RandomBottleListBuilder {
         }
     }
     
-    private int getActualPours(int maximumPourSection) {
-        return 1 + random.nextInt(maximumPourSection);
+    private void colorBottleRandomly(Bottle bottle) {
+        int colors = SectionColor.values().length;
+        SectionColor color = SectionColor.values()[random.nextInt(colors)];
+        
+        while (!bottle.isFull()) {
+            bottle.push(color);
+        }
     }
     
-    private Bottle findNonFullBottle(BottleList bottleList) {
+    private Bottle findNonFullBottle() {
         return nonFullBottleList.get(random.nextInt(nonFullBottleList.size()));
-    }
-    
-    private static <T> T choose(List<T> list, Random random) {
-        return list.get(random.nextInt(list.size()));
     }
 }
