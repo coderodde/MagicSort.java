@@ -298,8 +298,6 @@ public final class Bottle {
             return 0;
         }
         
-        SectionColor sourceColor = source.getTopmostSectionColor();
-        
         if (target.isEmpty()) {
             return source.filledSections();
         }
@@ -308,6 +306,7 @@ public final class Bottle {
             return 0;
         }
         
+        SectionColor sourceColor = source.getTopmostSectionColor();
         SectionColor targetColor = target.getTopmostSectionColor();
         
         if (sourceColor != targetColor) {
@@ -315,6 +314,7 @@ public final class Bottle {
         }
         
         for (int i = 1; i < maxPours; ++i) {
+            // TODO: Bug is here.
             SectionColor tentativeSourceColor = source.getSectionColor(i);
             SectionColor tentativeTargetColor = target.getSectionColor(i);
             
